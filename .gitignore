@@ -1,4 +1,5 @@
 /vendor/
+/pdf/*
 /logs/*
 !/logs/README.md
 logs
