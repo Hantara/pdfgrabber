@@ -26,38 +26,52 @@ $app->run();
 
 
 //Tampilkan list reservasi online
-function getReservasi() {
+function getReservasi(Request $request, Response $response) {
 	$sql = "select * FROM reservasi ORDER BY rsv_date DESC";
 	try {
 		$db = getConnection();
-		$stmt = $db->query($sql);  
-		$wines = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$stmt = $db->query($sql);
+		$reservasi = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
-		echo json_encode($wines);
+
+    //$response->setStatus(200);
+    $response->withHeader('Content-type', 'application/json');
+    //header('Content-Type: application/json');
+		//echo json_encode($reservasi);
+    $response->withJson($reservasi);
+    return $response;
 	} catch(PDOException $e) {
-		echo '{"error":{"text":'. $e->getMessage() .'}}'; 
+		echo '{"error":{"text":'. $e->getMessage() .'}}';
 	}
 }
 
 
 //Tambah reservasi ke database
-function addReservasi() {
-	$request = Slim::getInstance()->request();
-	$user = json_decode($request->getBody());
-	$sql = "INSERT INTO users (username, first_name, last_name, address) VALUES (:username, :first_name, :last_name, :address)";
+function addReservasi(Request $request) {
+	//$request = Slim::getInstance()->request();
+	$reservasi = json_decode($request->getBody());
+
+  $sql = "INSERT INTO 'reservasi'(rsv_no', 'rsv_date', 'rsv_arrival', 'rsv_departure', 'rsv_source', 'rsv_Fname', 'rsv_Lname')
+  VALUES
+  (:rsv_no,:rsv_date,:rsv_arrival,:rsv_departure,:rsv_source,:rsv_Fname,:rsv_Lname)";
+
 	try {
 		$db = getConnection();
-		$stmt = $db->prepare($sql);  
-		$stmt->bindParam("username", $user->username);
-		$stmt->bindParam("first_name", $user->first_name);
-		$stmt->bindParam("last_name", $user->last_name);
-		$stmt->bindParam("address", $user->address);
+		$stmt = $db->prepare($sql);
+		$stmt->bindParam("rsv_no", $reservasi->rsv_no);
+		$stmt->bindParam("rsv_date", $reservasi->rsv_date);
+		$stmt->bindParam("rsv_arrival", $reservasi->rsv_arrival);
+		$stmt->bindParam("rsv_departure", $reservasi->rsv_departure);
+    $stmt->bindParam("rsv_source", $reservasi->rsv_source);
+		$stmt->bindParam("rsv_Fname", $reservasi->rsv_Fname);
+		$stmt->bindParam("rsv_Lname", $reservasi->rsv_Lname);
+
 		$stmt->execute();
-		$user->id = $db->lastInsertId();
+		$reservasi->id = $db->lastInsertId();
 		$db = null;
-		echo json_encode($user); 
+		echo json_encode($reservasi);
 	} catch(PDOException $e) {
-		echo '{"error":{"text":'. $e->getMessage() .'}}'; 
+		echo '{"error":{"text":'. $e->getMessage() .'}}';
 	}
 }
 
@@ -68,7 +82,7 @@ function getConnection() {
 	$dbuser="root";
 	$dbpass="";
 	$dbname="grabbing";
-	$dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);	
+	$dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);
 	$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	return $dbh;
 }
