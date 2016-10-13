@@ -26,7 +26,6 @@ $app->run();
 
 
 //Tampilkan list reservasi online
-
 function getReservasi() {
 	$sql = "select * FROM reservasi ORDER BY rsv_date DESC";
 	try {
@@ -41,6 +40,7 @@ function getReservasi() {
 }
 
 
+//Tambah reservasi ke database
 function addReservasi() {
 	$request = Slim::getInstance()->request();
 	$user = json_decode($request->getBody());
