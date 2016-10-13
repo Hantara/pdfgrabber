@@ -35,9 +35,11 @@ function getReservasi(Request $request, Response $response) {
 		$db = null;
 
     //$response->setStatus(200);
-    $response->withHeader('Content-type', 'application/json');
+
     //header('Content-Type: application/json');
 		//echo json_encode($reservasi);
+    $response->withStatus(200);
+    $response->withHeader('Content-type', 'application/json');
     $response->withJson($reservasi);
     return $response;
 	} catch(PDOException $e) {
